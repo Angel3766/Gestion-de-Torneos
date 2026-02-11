@@ -1,0 +1,15 @@
+torneos-futbol/
+│
+├── app.py
+├── database.db
+├── requirements.txt
+│
+├── templates/
+│   ├── base.html
+│   ├── index.html
+│
+├── static/
+│   ├── css/
+│   │   └── style.css
+│
+└── README.md
