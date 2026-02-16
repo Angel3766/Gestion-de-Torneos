@@ -1,37 +1,50 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Sistema de Torneos</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
+{% extends "base.html" %}
 
-<body>
+{% block title %}Torneos{% endblock %}
 
-<header>
-    <h1>Sistema de Torneos de Fútbol</h1>
+{% block content %}
 
-    <nav>
-        <a href="/">Inicio</a>
-        <a href="/torneos">Torneos</a>
-        <a href="/equipos">Equipos</a>
-        <a href="/partidos">Partidos</a>
-    </nav>
-</header>
+<h2>Lista de Torneos</h2>
 
-<main>
-    <section>
-        <h2>Bienvenido</h2>
+<a href="{{ url_for('crear_torneo') }}">Nuevo Torneo</a>
+<br><br>
 
-        <p>
-            Este sistema permite administrar torneos, equipos y partidos.
-        </p>
-    </section>
-</main>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Fecha</th>
+        <th>Lugar</th>
+        <th>Equipos</th>
+        <th>Acciones</th>
+    </tr>
 
-<footer>
-    <p>Proyecto Flask - {{ 2026 }}</p>
-</footer>
+    {% for torneo in torneos %}
+    <tr>
+        <td>{{ torneo.id }}</td>
+        <td>{{ torneo.nombre }}</td>
+        <td>{{ torneo.fecha }}</td>
+        <td>{{ torneo.lugar }}</td>
+        <td>
+            {% set equipos_torneo = equipos | selectattr("torneo_id", "equalto", torneo.id) | list %}
+            {% if equipos_torneo %}
+                <ul>
+                    {% for equipo in equipos_torneo %}
+                        <li>{{ equipo.nombre }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <em>No hay equipos</em>
+            {% endif %}
+        </td>
+        <td>
+            <a href="{{ url_for('editar_torneo', id=torneo.id) }}">Editar</a> |
+            <a href="{{ url_for('eliminar_torneo', id=torneo.id) }}"
+               onclick="return confirm('¿Eliminar torneo?')">Eliminar</a> |
+            <a href="{{ url_for('ver_torneo', id=torneo.id) }}">Ver Equipos</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
 
-</body>
-</html>
+{% endblock %}

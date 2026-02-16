@@ -1,242 +1,292 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 import sqlite3
 
 app = Flask(__name__)
-DATABASE = 'torneos.db'
+app.secret_key = "supersecretkey"
 
+DATABASE = "database.db"
 
+# ========================
+# CONEXIÓN A BD
+# ========================
 def get_db():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
 
-
+# ========================
+# CREAR TABLAS
+# ========================
 def init_db():
     conn = get_db()
     cursor = conn.cursor()
 
-    # Usuarios
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        email TEXT
-    )
+        CREATE TABLE IF NOT EXISTS torneos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            fecha TEXT NOT NULL,
+            lugar TEXT NOT NULL
+        )
     """)
 
-    # Torneos
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS torneos(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT,
-        fecha_inicio TEXT,
-        fecha_fin TEXT
-    )
-    """)
-
-    # Equipos
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS equipos(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT,
-        torneo_id INTEGER,
-        FOREIGN KEY(torneo_id) REFERENCES torneos(id)
-    )
-    """)
-
-    # Partidos
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS partidos(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        equipo1_id INTEGER,
-        equipo2_id INTEGER,
-        goles1 INTEGER,
-        goles2 INTEGER,
-        fecha TEXT,
-        torneo_id INTEGER,
-        FOREIGN KEY(equipo1_id) REFERENCES equipos(id),
-        FOREIGN KEY(equipo2_id) REFERENCES equipos(id),
-        FOREIGN KEY(torneo_id) REFERENCES torneos(id)
-    )
+        CREATE TABLE IF NOT EXISTS equipos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            torneo_id INTEGER NOT NULL,
+            FOREIGN KEY (torneo_id) REFERENCES torneos(id) ON DELETE CASCADE
+        )
     """)
 
     conn.commit()
     conn.close()
-
 
 init_db()
 
+# ========================
+# FUNCIONES CRUD TORNEOS
+# ========================
+def obtener_torneos():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM torneos")
+    torneos = cursor.fetchall()
+    conn.close()
+    return torneos
 
-# ---------------- HOME ----------------
+def obtener_torneo(id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM torneos WHERE id = ?", (id,))
+    torneo = cursor.fetchone()
+    conn.close()
+    return torneo
 
+def crear_torneo_db(nombre, fecha, lugar):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO torneos (nombre, fecha, lugar) VALUES (?, ?, ?)", (nombre, fecha, lugar))
+    conn.commit()
+    conn.close()
+
+def editar_torneo_db(id, nombre, fecha, lugar):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE torneos SET nombre = ?, fecha = ?, lugar = ? WHERE id = ?", (nombre, fecha, lugar, id))
+    conn.commit()
+    conn.close()
+
+def eliminar_torneo_db(id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM torneos WHERE id = ?", (id,))
+    conn.commit()
+    conn.close()
+
+# ========================
+# FUNCIONES CRUD EQUIPOS
+# ========================
+def obtener_equipos():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT equipos.id, equipos.nombre, torneos.nombre AS torneo_nombre, torneos.id AS torneo_id
+        FROM equipos
+        JOIN torneos ON equipos.torneo_id = torneos.id
+    """)
+    equipos = cursor.fetchall()
+    conn.close()
+    return equipos
+
+def obtener_equipo(id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM equipos WHERE id = ?", (id,))
+    equipo = cursor.fetchone()
+    conn.close()
+    return equipo
+
+def crear_equipo_db(nombre, torneo_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO equipos (nombre, torneo_id) VALUES (?, ?)", (nombre, torneo_id))
+    conn.commit()
+    conn.close()
+
+def editar_equipo_db(id, nombre, torneo_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE equipos SET nombre = ?, torneo_id = ? WHERE id = ?", (nombre, torneo_id, id))
+    conn.commit()
+    conn.close()
+
+def eliminar_equipo_db(id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM equipos WHERE id = ?", (id,))
+    conn.commit()
+    conn.close()
+
+# ========================
+# RUTAS TORNEOS
+# ========================
 @app.route("/")
 def index():
-    return render_template("index.html")
+    torneos = obtener_torneos()
+    equipos = obtener_equipos()
+    return render_template("index.html", torneos=torneos, equipos=equipos)
 
-
-# ---------------- TORNEOS ----------------
-
-@app.route("/torneos")
-def torneos():
-    conn = get_db()
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM torneos")
-    torneos = cursor.fetchall()
-
-    conn.close()
-
-    return render_template("torneos.html", torneos=torneos)
-
-
-@app.route("/torneos/create", methods=["GET", "POST"])
+@app.route("/crear", methods=["GET", "POST"])
 def crear_torneo():
+    if request.method == "POST":
+        nombre = request.form.get("nombre", "").strip()
+        fecha = request.form.get("fecha", "").strip()
+        lugar = request.form.get("lugar", "").strip()
+
+        if not nombre or not fecha or not lugar:
+            flash("Todos los campos son obligatorios", "error")
+            return render_template("crear.html")
+
+        try:
+            crear_torneo_db(nombre, fecha, lugar)
+            flash("Torneo creado exitosamente", "success")
+            return redirect(url_for("index"))
+        except Exception as e:
+            flash(f"Error al crear torneo: {e}", "error")
+            return render_template("crear.html")
+
+    return render_template("crear.html")
+
+@app.route("/editar/<int:id>", methods=["GET", "POST"])
+def editar_torneo(id):
+    torneo = obtener_torneo(id)
+    if not torneo:
+        flash("Torneo no encontrado", "error")
+        return redirect(url_for("index"))
 
     if request.method == "POST":
-        nombre = request.form["nombre"]
-        inicio = request.form["inicio"]
-        fin = request.form["fin"]
+        nombre = request.form.get("nombre", "").strip()
+        fecha = request.form.get("fecha", "").strip()
+        lugar = request.form.get("lugar", "").strip()
 
-        conn = get_db()
-        cursor = conn.cursor()
+        if not nombre or not fecha or not lugar:
+            flash("Todos los campos son obligatorios", "error")
+            return render_template("editar.html", torneo=torneo)
 
-        cursor.execute("""
-        INSERT INTO torneos(nombre, fecha_inicio, fecha_fin)
-        VALUES (?, ?, ?)
-        """, (nombre, inicio, fin))
+        try:
+            editar_torneo_db(id, nombre, fecha, lugar)
+            flash("Torneo actualizado exitosamente", "success")
+            return redirect(url_for("index"))
+        except Exception as e:
+            flash(f"Error al actualizar torneo: {e}", "error")
+            return render_template("editar.html", torneo=torneo)
 
-        conn.commit()
-        conn.close()
+    return render_template("editar.html", torneo=torneo)
 
-        return redirect(url_for("torneos"))
-
-    return render_template("crear_torneo.html")
-
-
-@app.route("/torneos/delete/<int:id>")
+@app.route("/eliminar/<int:id>")
 def eliminar_torneo(id):
+    torneo = obtener_torneo(id)
+    if not torneo:
+        flash("Torneo no encontrado", "error")
+    else:
+        try:
+            eliminar_torneo_db(id)
+            flash("Torneo eliminado exitosamente", "success")
+        except Exception as e:
+            flash(f"Error al eliminar torneo: {e}", "error")
+    return redirect(url_for("index"))
 
-    conn = get_db()
-    cursor = conn.cursor()
-
-    cursor.execute("DELETE FROM torneos WHERE id = ?", (id,))
-
-    conn.commit()
-    conn.close()
-
-    return redirect(url_for("torneos"))
-
-
-# ---------------- EQUIPOS ----------------
-
+# ========================
+# RUTAS EQUIPOS
+# ========================
 @app.route("/equipos")
-def equipos():
-
-    conn = get_db()
-    cursor = conn.cursor()
-
-    cursor.execute("""
-    SELECT equipos.*, torneos.nombre AS torneo
-    FROM equipos
-    JOIN torneos ON equipos.torneo_id = torneos.id
-    """)
-
-    equipos = cursor.fetchall()
-
-    cursor.execute("SELECT * FROM torneos")
-    torneos = cursor.fetchall()
-
-    conn.close()
-
+def equipos_interface():
+    equipos = obtener_equipos()
+    torneos = obtener_torneos()
     return render_template("equipos.html", equipos=equipos, torneos=torneos)
 
-
-@app.route("/equipos/create", methods=["POST"])
+@app.route("/equipos/crear", methods=["GET", "POST"])
 def crear_equipo():
+    torneos = obtener_torneos()
+    if request.method == "POST":
+        nombre = request.form.get("nombre", "").strip()
+        torneo_id = request.form.get("torneo_id")
 
-    nombre = request.form["nombre"]
-    torneo = request.form["torneo"]
+        if not nombre or not torneo_id:
+            flash("Todos los campos son obligatorios", "error")
+            return render_template("crear_equipo.html", torneos=torneos)
+
+        try:
+            crear_equipo_db(nombre, torneo_id)
+            flash("Equipo creado exitosamente", "success")
+            return redirect(url_for("equipos_interface"))
+        except Exception as e:
+            flash(f"Error al crear equipo: {e}", "error")
+            return render_template("crear_equipo.html", torneos=torneos)
+
+    return render_template("crear_equipo.html", torneos=torneos)
+
+@app.route("/equipos/editar/<int:id>", methods=["GET", "POST"])
+def editar_equipo(id):
+    equipo = obtener_equipo(id)
+    torneos = obtener_torneos()
+    if not equipo:
+        flash("Equipo no encontrado", "error")
+        return redirect(url_for("equipos_interface"))
+
+    if request.method == "POST":
+        nombre = request.form.get("nombre", "").strip()
+        torneo_id = request.form.get("torneo_id")
+
+        if not nombre or not torneo_id:
+            flash("Todos los campos son obligatorios", "error")
+            return render_template("crear_equipo.html", equipo=equipo, torneos=torneos)
+
+        try:
+            editar_equipo_db(id, nombre, torneo_id)
+            flash("Equipo actualizado exitosamente", "success")
+            return redirect(url_for("equipos_interface"))
+        except Exception as e:
+            flash(f"Error al actualizar equipo: {e}", "error")
+            return render_template("crear_equipo.html", equipo=equipo, torneos=torneos)
+
+    return render_template("crear_equipo.html", equipo=equipo, torneos=torneos)
+
+@app.route("/equipos/eliminar/<int:id>")
+def eliminar_equipo(id):
+    equipo = obtener_equipo(id)
+    if not equipo:
+        flash("Equipo no encontrado", "error")
+    else:
+        try:
+            eliminar_equipo_db(id)
+            flash("Equipo eliminado exitosamente", "success")
+        except Exception as e:
+            flash(f"Error al eliminar equipo: {e}", "error")
+    return redirect(url_for("equipos_interface"))
+
+# ========================
+# RUTA PARA VER TORNEO DETALLADO
+# ========================
+@app.route("/torneo/<int:id>")
+def ver_torneo(id):
+    torneo = obtener_torneo(id)
+    if not torneo:
+        flash("Torneo no encontrado", "error")
+        return redirect(url_for("index"))
 
     conn = get_db()
     cursor = conn.cursor()
-
-    cursor.execute("""
-    INSERT INTO equipos(nombre, torneo_id)
-    VALUES (?, ?)
-    """, (nombre, torneo))
-
-    conn.commit()
-    conn.close()
-
-    return redirect(url_for("equipos"))
-
-
-# ---------------- PARTIDOS ----------------
-
-@app.route("/partidos")
-def partidos():
-
-    conn = get_db()
-    cursor = conn.cursor()
-
-    cursor.execute("""
-    SELECT p.id,
-           e1.nombre AS equipo1,
-           e2.nombre AS equipo2,
-           p.goles1,
-           p.goles2,
-           p.fecha,
-           t.nombre AS torneo
-    FROM partidos p
-    JOIN equipos e1 ON p.equipo1_id = e1.id
-    JOIN equipos e2 ON p.equipo2_id = e2.id
-    JOIN torneos t ON p.torneo_id = t.id
-    """)
-
-    partidos = cursor.fetchall()
-
-    cursor.execute("SELECT * FROM equipos")
+    cursor.execute("SELECT * FROM equipos WHERE torneo_id = ?", (id,))
     equipos = cursor.fetchall()
-
-    cursor.execute("SELECT * FROM torneos")
-    torneos = cursor.fetchall()
-
     conn.close()
 
-    return render_template(
-        "partidos.html",
-        partidos=partidos,
-        equipos=equipos,
-        torneos=torneos
-    )
+    return render_template("ver_torneo.html", torneo=torneo, equipos=equipos)
 
 
-@app.route("/partidos/create", methods=["POST"])
-def crear_partido():
-
-    e1 = request.form["equipo1"]
-    e2 = request.form["equipo2"]
-    g1 = request.form["goles1"]
-    g2 = request.form["goles2"]
-    fecha = request.form["fecha"]
-    torneo = request.form["torneo"]
-
-    conn = get_db()
-    cursor = conn.cursor()
-
-    cursor.execute("""
-    INSERT INTO partidos
-    (equipo1_id, equipo2_id, goles1, goles2, fecha, torneo_id)
-    VALUES (?, ?, ?, ?, ?, ?)
-    """, (e1, e2, g1, g2, fecha, torneo))
-
-    conn.commit()
-    conn.close()
-
-    return redirect(url_for("partidos"))
-
-
-# ---------------- MAIN ----------------
-
+# ========================
+# EJECUTAR
+# ========================
 if __name__ == "__main__":
     app.run(debug=True)

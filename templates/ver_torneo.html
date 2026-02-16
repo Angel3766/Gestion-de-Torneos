@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle Torneo{% endblock %}
+
+{% block content %}
+
+<h2>Detalle del Torneo: {{ torneo.nombre }}</h2>
+
+<p><strong>Fecha:</strong> {{ torneo.fecha }}</p>
+<p><strong>Lugar:</strong> {{ torneo.lugar }}</p>
+
+<h3>Equipos Participantes:</h3>
+
+{% if equipos %}
+    <ul>
+        {% for equipo in equipos %}
+            <li>{{ equipo.nombre }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p><em>No hay equipos asignados a este torneo.</em></p>
+{% endif %}
+
+<br>
+<a href="{{ url_for('index') }}">⬅ Volver a Torneos</a>
+
+{% endblock %}

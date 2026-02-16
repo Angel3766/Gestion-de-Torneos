@@ -1,0 +1,133 @@
+/* ===== Body & Layout ===== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background: #f7f9fc;
+    color: #333;
+}
+
+header {
+    background: #1f2937;
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+nav a {
+    color: white;
+    margin-left: 15px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+nav a:hover {
+    color: #fbbf24; /* amarillo */
+}
+
+main {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 20px 30px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* ===== Table ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+th {
+    background: #2563eb; /* azul */
+    color: white;
+    font-weight: 600;
+    border-radius: 4px 4px 0 0;
+}
+
+tr:nth-child(even) {
+    background: #f1f5f9;
+}
+
+tr:hover {
+    background: #e0f2fe;
+}
+
+/* ===== Buttons ===== */
+button, .btn {
+    padding: 8px 16px;
+    background: #10b981; /* verde */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+button:hover, .btn:hover {
+    background: #059669;
+}
+
+a.btn-link {
+    text-decoration: none;
+    padding: 6px 12px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+a.btn-link:hover {
+    background: #2563eb;
+}
+
+/* ===== Flash Messages ===== */
+ul.flashes {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+ul.flashes li {
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+ul.flashes li.success {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+ul.flashes li.error {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* ===== Listas dentro de tablas ===== */
+td ul {
+    padding-left: 15px;
+    margin: 0;
+}
+
+td ul li {
+    list-style: disc;
+}

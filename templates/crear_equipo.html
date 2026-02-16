@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Equipo{% endblock %}
+
+{% block content %}
+
+<h2>{% if equipo %}Editar Equipo{% else %}Crear Equipo{% endif %}</h2>
+
+<form method="POST">
+
+    <label>Nombre del Equipo:</label><br>
+    <input type="text" name="nombre" value="{{ equipo.nombre if equipo else '' }}" required><br><br>
+
+    <label>Torneo:</label><br>
+    <select name="torneo_id" required>
+        <option value="">-- Selecciona un torneo --</option>
+        {% for torneo in torneos %}
+            {% if equipo and equipo.torneo_id == torneo.id %}
+                <option value="{{ torneo.id }}" selected>{{ torneo.nombre }}</option>
+            {% else %}
+                <option value="{{ torneo.id }}">{{ torneo.nombre }}</option>
+            {% endif %}
+        {% endfor %}
+    </select><br><br>
+
+    <button type="submit">{% if equipo %}Actualizar{% else %}Crear{% endif %}</button>
+
+</form>
+
+<br>
+<a href="{{ url_for('equipos_interface') }}">⬅ Volver a Equipos</a>
+
+{% endblock %}

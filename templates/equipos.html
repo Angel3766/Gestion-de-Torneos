@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Equipos{% endblock %}
+
+{% block content %}
+
+<h2>Lista de Equipos</h2>
+
+<a href="{{ url_for('crear_equipo') }}">Nuevo Equipo</a>
+<br><br>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Nombre del Equipo</th>
+        <th>Torneo</th>
+        <th>Acciones</th>
+    </tr>
+
+    {% for equipo in equipos %}
+    <tr>
+        <td>{{ equipo.id }}</td>
+        <td>{{ equipo.nombre }}</td>
+        <td>{{ equipo.torneo_nombre }}</td>
+        <td>
+            <a href="{{ url_for('editar_equipo', id=equipo.id) }}">Editar</a> |
+            <a href="{{ url_for('eliminar_equipo', id=equipo.id) }}"
+               class="delete-btn"
+               onclick="return confirm('¿Eliminar equipo?')">Eliminar</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
