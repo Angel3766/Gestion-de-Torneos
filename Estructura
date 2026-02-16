@@ -1,15 +1,21 @@
-torneos-futbol/
+Gestion Torneo/
 │
 ├── app.py
 ├── database.db
-├── requirements.txt
 │
 ├── templates/
 │   ├── base.html
 │   ├── index.html
+│   ├── crear_equipo.html
+│   ├── crear.html
+│   ├── editar.html
+│   ├── equipos.html
+│   ├── ver_torneo.html
 │
 ├── static/
 │   ├── css/
 │   │   └── style.css
+│   ├── js/
+│   │   └── app.js
 │
 └── README.md
