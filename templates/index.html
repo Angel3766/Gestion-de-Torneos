@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Torneos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+
+<header>
+    <h1>Sistema de Torneos de Fútbol</h1>
+
+    <nav>
+        <a href="/">Inicio</a>
+        <a href="/torneos">Torneos</a>
+        <a href="/equipos">Equipos</a>
+        <a href="/partidos">Partidos</a>
+    </nav>
+</header>
+
+<main>
+    <section>
+        <h2>Bienvenido</h2>
+
+        <p>
+            Este sistema permite administrar torneos, equipos y partidos.
+        </p>
+    </section>
+</main>
+
+<footer>
+    <p>Proyecto Flask - {{ 2026 }}</p>
+</footer>
+
+</body>
+</html>
