@@ -1,133 +1,714 @@
-/* ===== Body & Layout ===== */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    background: #f7f9fc;
-    color: #333;
+/* ===== Variables CSS - Tema Deportivo Oscuro ===== */
+:root {
+    /* Colores principales - Verde neón y Naranja deportivo */
+    --neon-green: #39ff14;
+    --neon-green-dark: #2dd60f;
+    --sport-orange: #ff6b35;
+    --sport-orange-dark: #e55a2b;
+    --electric-yellow: #ffd93d;
+    
+    /* Tonos oscuros */
+    --dark-bg: #0a0e27;
+    --dark-card: #141b2d;
+    --dark-lighter: #1e2746;
+    --dark-border: #2d3a5c;
+    
+    /* Textos */
+    --text-bright: #ffffff;
+    --text-muted: #a0aec0;
+    --text-dim: #718096;
+    
+    /* Sombras con efecto neón */
+    --shadow-green: 0 0 20px rgba(57, 255, 20, 0.3);
+    --shadow-orange: 0 0 20px rgba(255, 107, 53, 0.3);
+    --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+    
+    --radius: 12px;
+    --transition: all 0.3s ease;
 }
 
+/* ===== Reset & Base ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Rajdhani', 'Roboto Condensed', sans-serif;
+    background: var(--dark-bg);
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(57, 255, 20, 0.03) 2px,
+            rgba(57, 255, 20, 0.03) 4px
+        ),
+        radial-gradient(circle at 20% 50%, rgba(255, 107, 53, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(57, 255, 20, 0.05) 0%, transparent 50%);
+    color: var(--text-bright);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ===== Header Estilo Deportivo ===== */
 header {
-    background: #1f2937;
-    color: white;
-    padding: 15px 30px;
+    background: linear-gradient(135deg, var(--dark-card) 0%, #0f1629 100%);
+    border-bottom: 3px solid var(--neon-green);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), var(--shadow-green);
+    padding: 1.5rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    animation: headerSlide 0.6s ease-out;
+}
+
+@keyframes headerSlide {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+header .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 2rem;
 }
 
 header h1 {
-    margin: 0;
-    font-size: 1.8rem;
+    font-size: 2.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--neon-green);
+    text-shadow: 0 0 10px rgba(57, 255, 20, 0.5),
+                 0 0 20px rgba(57, 255, 20, 0.3);
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+header h1::before {
+    content: "⚡";
+    font-size: 2.5rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        transform: scale(1);
+        filter: drop-shadow(0 0 5px var(--neon-green));
+    }
+    50% { 
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 15px var(--neon-green));
+    }
+}
+
+header h1::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--neon-green), transparent);
+}
+
+/* ===== Navegación Estilo Arcade ===== */
+nav {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
 }
 
 nav a {
-    color: white;
-    margin-left: 15px;
+    color: var(--text-bright);
     text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.75rem 1.5rem;
+    background: var(--dark-lighter);
+    border: 2px solid var(--dark-border);
+    border-radius: var(--radius);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+nav a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+nav a:hover::before {
+    left: 100%;
 }
 
 nav a:hover {
-    color: #fbbf24; /* amarillo */
+    border-color: var(--neon-green);
+    color: var(--neon-green);
+    box-shadow: var(--shadow-green);
+    transform: translateY(-3px);
 }
 
+nav a:active {
+    transform: translateY(-1px);
+}
+
+/* ===== Main Container con Efecto Profundidad ===== */
 main {
-    max-width: 1000px;
-    margin: 30px auto;
-    padding: 20px 30px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    max-width: 1400px;
+    margin: 3rem auto;
+    padding: 0 2rem;
+    animation: mainFadeIn 0.8s ease-out;
 }
 
-/* ===== Table ===== */
+@keyframes mainFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+main > * {
+    background: var(--dark-card);
+    border: 2px solid var(--dark-border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-card);
+    position: relative;
+}
+
+main > *::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--neon-green), var(--sport-orange));
+    border-radius: var(--radius) 0 0 var(--radius);
+}
+
+/* ===== Títulos con Efecto Neón ===== */
+h2 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--sport-orange);
+    margin-bottom: 2rem;
+    position: relative;
+    padding-bottom: 1rem;
+    text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--sport-orange), var(--neon-green));
+    box-shadow: 0 0 10px var(--sport-orange);
+}
+
+h3 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--neon-green);
+    margin: 2rem 0 1rem;
+    letter-spacing: 1px;
+}
+
+/* ===== Tablas con Diseño Futurista ===== */
 table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 1.5rem;
+    overflow: hidden;
+    border-radius: var(--radius);
+    border: 2px solid var(--dark-border);
 }
 
-th, td {
-    padding: 12px 15px;
-    text-align: left;
+thead {
+    background: linear-gradient(135deg, var(--dark-lighter), var(--dark-card));
+    border-bottom: 2px solid var(--neon-green);
 }
 
 th {
-    background: #2563eb; /* azul */
-    color: white;
-    font-weight: 600;
-    border-radius: 4px 4px 0 0;
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    font-weight: 800;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--neon-green);
+    text-shadow: 0 0 5px rgba(57, 255, 20, 0.5);
 }
 
-tr:nth-child(even) {
-    background: #f1f5f9;
+tbody tr {
+    background: var(--dark-card);
+    transition: var(--transition);
+    border-bottom: 1px solid var(--dark-border);
 }
 
-tr:hover {
-    background: #e0f2fe;
+tbody tr:last-child {
+    border-bottom: none;
 }
 
-/* ===== Buttons ===== */
-button, .btn {
-    padding: 8px 16px;
-    background: #10b981; /* verde */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background 0.2s;
+tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.02);
 }
 
-button:hover, .btn:hover {
-    background: #059669;
+tbody tr:hover {
+    background: rgba(57, 255, 20, 0.05);
+    border-left: 4px solid var(--neon-green);
+    transform: translateX(5px);
+    box-shadow: inset 0 0 20px rgba(57, 255, 20, 0.1);
 }
 
-a.btn-link {
+td {
+    padding: 1.25rem 1.5rem;
+    font-size: 1rem;
+    color: var(--text-bright);
+}
+
+/* ===== Enlaces en Tablas con Estilo Chip ===== */
+td a {
+    color: var(--text-bright);
     text-decoration: none;
-    padding: 6px 12px;
-    background: #3b82f6;
-    color: white;
-    border-radius: 5px;
-    font-weight: 500;
-    transition: background 0.2s;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.5rem 1rem;
+    background: var(--dark-lighter);
+    border: 1px solid var(--dark-border);
+    border-radius: 6px;
+    transition: var(--transition);
+    display: inline-block;
+    margin: 0.25rem;
 }
 
-a.btn-link:hover {
-    background: #2563eb;
+td a:hover {
+    background: var(--neon-green);
+    color: var(--dark-bg);
+    border-color: var(--neon-green);
+    box-shadow: var(--shadow-green);
+    transform: scale(1.05);
 }
 
-/* ===== Flash Messages ===== */
+td a.delete-btn {
+    background: var(--dark-lighter);
+    border-color: var(--sport-orange);
+    color: var(--sport-orange);
+}
+
+td a.delete-btn:hover {
+    background: var(--sport-orange);
+    color: var(--dark-bg);
+    box-shadow: var(--shadow-orange);
+}
+
+/* ===== Botones Estilo Gaming ===== */
+button,
+.btn,
+a.btn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, var(--neon-green), var(--neon-green-dark));
+    color: var(--dark-bg);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: 900;
+    font-size: 1rem;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: var(--transition);
+    box-shadow: var(--shadow-green);
+    position: relative;
+    overflow: hidden;
+}
+
+button::after,
+.btn::after {
+    content: '▶';
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    transition: var(--transition);
+}
+
+button:hover::after,
+.btn:hover::after {
+    right: 1rem;
+}
+
+button:hover,
+.btn:hover,
+a.btn:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 0 30px rgba(57, 255, 20, 0.6);
+}
+
+button:active,
+.btn:active {
+    transform: translateY(-2px) scale(1.03);
+}
+
+/* ===== Formularios con Estilo Tech ===== */
+form {
+    background: rgba(20, 27, 45, 0.6);
+    padding: 2.5rem;
+    border: 2px solid var(--dark-border);
+    border-radius: var(--radius);
+    backdrop-filter: blur(10px);
+}
+
+label {
+    display: block;
+    font-weight: 700;
+    color: var(--electric-yellow);
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: 2px solid var(--dark-border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    transition: var(--transition);
+    background: var(--dark-lighter);
+    color: var(--text-bright);
+    font-family: inherit;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--neon-green);
+    background: var(--dark-card);
+    box-shadow: var(--shadow-green), inset 0 0 10px rgba(57, 255, 20, 0.1);
+}
+
+input:hover,
+select:hover {
+    border-color: var(--neon-green);
+}
+
+select option {
+    background: var(--dark-card);
+    color: var(--text-bright);
+}
+
+/* ===== Mensajes Flash Estilo Notificación ===== */
 ul.flashes {
     list-style: none;
     padding: 0;
-    margin: 10px 0;
+    margin: 0 0 2rem 0;
+    position: relative;
 }
 
 ul.flashes li {
-    padding: 12px 15px;
-    margin-bottom: 10px;
-    border-radius: 6px;
-    font-weight: 500;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    border-radius: var(--radius);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: slideInLeft 0.5s ease-out;
+    border: 2px solid;
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+ul.flashes li::before {
+    font-size: 2rem;
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
 }
 
 ul.flashes li.success {
-    background-color: #d1fae5;
-    color: #065f46;
+    background: rgba(57, 255, 20, 0.15);
+    color: var(--neon-green);
+    border-color: var(--neon-green);
+    box-shadow: var(--shadow-green);
+}
+
+ul.flashes li.success::before {
+    content: "✓";
 }
 
 ul.flashes li.error {
-    background-color: #fee2e2;
-    color: #991b1b;
+    background: rgba(255, 107, 53, 0.15);
+    color: var(--sport-orange);
+    border-color: var(--sport-orange);
+    box-shadow: var(--shadow-orange);
 }
 
-/* ===== Listas dentro de tablas ===== */
+ul.flashes li.error::before {
+    content: "⚠";
+}
+
+/* ===== Listas en Tablas ===== */
 td ul {
-    padding-left: 15px;
-    margin: 0;
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
 }
 
 td ul li {
-    list-style: disc;
+    list-style: none;
+    position: relative;
+    padding-left: 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+}
+
+td ul li::before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: var(--neon-green);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* ===== Enlaces de Navegación ===== */
+a[href*="Volver"] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2rem;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--dark-border);
+    border-radius: var(--radius);
+    transition: var(--transition);
+}
+
+a[href*="Volver"]::before {
+    content: "←";
+    font-size: 1.5rem;
+    transition: var(--transition);
+}
+
+a[href*="Volver"]:hover {
+    background: var(--dark-lighter);
+    border-color: var(--electric-yellow);
+    color: var(--electric-yellow);
+    transform: translateX(-10px);
+}
+
+a[href*="Volver"]:hover::before {
+    transform: translateX(-5px);
+}
+
+/* ===== Footer Estilo Minimal ===== */
+footer {
+    background: var(--dark-card);
+    border-top: 2px solid var(--neon-green);
+    padding: 2rem;
+    text-align: center;
+    margin-top: 4rem;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+}
+
+footer p {
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+footer p::before {
+    content: "⚡ ";
+    color: var(--neon-green);
+}
+
+footer p::after {
+    content: " ⚡";
+    color: var(--sport-orange);
+}
+
+/* ===== Elementos Pequeños ===== */
+small {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+em {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+strong, b {
+    color: var(--electric-yellow);
+    font-weight: 800;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 968px) {
+    header .header-content {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    header h1 {
+        font-size: 1.75rem;
+    }
+    
+    nav {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    main {
+        margin: 1.5rem;
+        padding: 0 1rem;
+    }
+    
+    main > * {
+        padding: 1.5rem;
+    }
+    
+    h2 {
+        font-size: 2rem;
+    }
+    
+    table {
+        font-size: 0.9rem;
+    }
+    
+    th, td {
+        padding: 0.875rem;
+    }
+}
+
+@media (max-width: 640px) {
+    header h1 {
+        font-size: 1.5rem;
+        letter-spacing: 1px;
+    }
+    
+    h2 {
+        font-size: 1.75rem;
+    }
+    
+    nav a {
+        font-size: 0.85rem;
+        padding: 0.625rem 1rem;
+    }
+    
+    button, .btn {
+        padding: 0.875rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* ===== Scrollbar Estilo Gaming ===== */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--dark-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--neon-green), var(--sport-orange));
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--neon-green-dark), var(--sport-orange-dark));
+    box-shadow: 0 0 10px var(--neon-green);
+}
+
+/* ===== Efectos de Selección ===== */
+::selection {
+    background: var(--neon-green);
+    color: var(--dark-bg);
+}
+
+::-moz-selection {
+    background: var(--neon-green);
+    color: var(--dark-bg);
+}
+
+/* ===== Loader (por si quieres agregarlo) ===== */
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--dark-border);
+    border-top-color: var(--neon-green);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 2rem auto;
+    box-shadow: var(--shadow-green);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
