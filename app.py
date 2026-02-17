@@ -21,15 +21,28 @@ def init_db():
     conn = get_db()
     cursor = conn.cursor()
 
+    # Tabla usuarios
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE
+        )
+    """)
+
+    # Tabla torneos con FK a usuarios
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS torneos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
             fecha TEXT NOT NULL,
-            lugar TEXT NOT NULL
+            lugar TEXT NOT NULL,
+            creador_id INTEGER,
+            FOREIGN KEY(creador_id) REFERENCES usuarios(id)
         )
     """)
 
+    # Tabla equipos con FK a torneos
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS equipos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,12 +58,33 @@ def init_db():
 init_db()
 
 # ========================
+# FUNCIONES CRUD USUARIOS
+# ========================
+def obtener_usuarios():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM usuarios")
+    usuarios = cursor.fetchall()
+    conn.close()
+    return usuarios
+
+def crear_usuario_db(nombre, email):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO usuarios (nombre, email) VALUES (?, ?)", (nombre, email))
+    conn.commit()
+    conn.close()
+
+# ========================
 # FUNCIONES CRUD TORNEOS
 # ========================
 def obtener_torneos():
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM torneos")
+    cursor.execute("""
+        SELECT torneos.*, usuarios.nombre AS creador_nombre
+        FROM torneos LEFT JOIN usuarios ON torneos.creador_id = usuarios.id
+    """)
     torneos = cursor.fetchall()
     conn.close()
     return torneos
@@ -63,17 +97,19 @@ def obtener_torneo(id):
     conn.close()
     return torneo
 
-def crear_torneo_db(nombre, fecha, lugar):
+def crear_torneo_db(nombre, fecha, lugar, creador_id):
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO torneos (nombre, fecha, lugar) VALUES (?, ?, ?)", (nombre, fecha, lugar))
+    cursor.execute("INSERT INTO torneos (nombre, fecha, lugar, creador_id) VALUES (?, ?, ?, ?)",
+                   (nombre, fecha, lugar, creador_id))
     conn.commit()
     conn.close()
 
 def editar_torneo_db(id, nombre, fecha, lugar):
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("UPDATE torneos SET nombre = ?, fecha = ?, lugar = ? WHERE id = ?", (nombre, fecha, lugar, id))
+    cursor.execute("UPDATE torneos SET nombre = ?, fecha = ?, lugar = ? WHERE id = ?",
+                   (nombre, fecha, lugar, id))
     conn.commit()
     conn.close()
 
@@ -129,6 +165,24 @@ def eliminar_equipo_db(id):
     conn.close()
 
 # ========================
+# RUTAS USUARIOS
+# ========================
+@app.route("/usuarios/crear", methods=["GET", "POST"])
+def crear_usuario():
+    if request.method == "POST":
+        nombre = request.form["nombre"]
+        email = request.form["email"]
+        try:
+            crear_usuario_db(nombre, email)
+            flash("Usuario creado correctamente", "success")
+            return redirect(url_for("index"))
+        except Exception as e:
+            flash(f"Error al crear usuario: {e}", "error")
+            return render_template("crear_usuario.html")
+
+    return render_template("crear_usuario.html")
+
+# ========================
 # RUTAS TORNEOS
 # ========================
 @app.route("/")
@@ -139,24 +193,26 @@ def index():
 
 @app.route("/crear", methods=["GET", "POST"])
 def crear_torneo():
+    usuarios = obtener_usuarios()
     if request.method == "POST":
         nombre = request.form.get("nombre", "").strip()
         fecha = request.form.get("fecha", "").strip()
         lugar = request.form.get("lugar", "").strip()
+        creador_id = request.form.get("creador_id")
 
-        if not nombre or not fecha or not lugar:
+        if not nombre or not fecha or not lugar or not creador_id:
             flash("Todos los campos son obligatorios", "error")
-            return render_template("crear.html")
+            return render_template("crear.html", usuarios=usuarios)
 
         try:
-            crear_torneo_db(nombre, fecha, lugar)
+            crear_torneo_db(nombre, fecha, lugar, creador_id)
             flash("Torneo creado exitosamente", "success")
             return redirect(url_for("index"))
         except Exception as e:
             flash(f"Error al crear torneo: {e}", "error")
-            return render_template("crear.html")
+            return render_template("crear.html", usuarios=usuarios)
 
-    return render_template("crear.html")
+    return render_template("crear.html", usuarios=usuarios)
 
 @app.route("/editar/<int:id>", methods=["GET", "POST"])
 def editar_torneo(id):
@@ -283,7 +339,6 @@ def ver_torneo(id):
     conn.close()
 
     return render_template("ver_torneo.html", torneo=torneo, equipos=equipos)
-
 
 # ========================
 # EJECUTAR
