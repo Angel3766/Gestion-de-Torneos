@@ -17,11 +17,21 @@
     <label>Lugar:</label><br>
     <input type="text" name="lugar" required><br><br>
 
-    <button type="submit">Guardar</button>
+    <label>Creador:</label>
+    {% if usuarios|length == 0 %}
+        <p>No hay usuarios. <a href="{{ url_for('crear_usuario') }}">Crea uno aquí</a></p>
+    {% else %}
+        <select name="creador_id" required>
+            {% for user in usuarios %}
+                <option value="{{ user.id }}">{{ user.nombre }}</option>
+            {% endfor %}
+        </select>
+        <small><a href="{{ url_for('crear_usuario') }}">➕ Crear nuevo usuario</a></small>
+    {% endif %}
+    <br><br>
+
+    <button type="submit" class="btn">Guardar</button>
 
 </form>
-
-<br>
-<a href="{{ url_for('index') }}">⬅ Volver a Torneos</a>
 
 {% endblock %}
